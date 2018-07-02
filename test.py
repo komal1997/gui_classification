@@ -10,7 +10,7 @@ from tkinter import *
 from functools import partial
 
 def read_data():
-	odf=pd.read_csv('temp.csv')
+	odf=pd.read_csv('breast-cancer-wisconsin.csv')
 	return odf
 
 def get_headers(dataset):
@@ -35,12 +35,18 @@ def linear_regression(features,targets):
 	clf=linear_model.LinearRegression()
 	clf.fit(features,targets)
 	return clf
-    
+
+def handle_missing_values(dataset,missing_values_header,missing_label):
+	t=missing_values_header
+	x=(dataset[t]!=missing_label)
+	return dataset[x]
+
+
 def final(arg,features,targets):
 	switcher = {
 	1:Naive_bayes(features,targets),
 	2:random_forest_classifier(features,targets),
-	3:linear_regression(features,targets),
+	3:linear_regression(features,targets)
 	}
 	return switcher.get(arg,"Nothing")
 
@@ -50,8 +56,8 @@ global call_result
 def main():
 	dataset=read_data()
 	HEADERS=get_headers(dataset)
-
-	train_x,test_x,train_y,test_y=split_dataset(dataset,0.99,HEADERS[1:-1],HEADERS[-1])
+	dataset=handle_missing_values(dataset,HEADERS[6],'?')
+	train_x,test_x,train_y,test_y=split_dataset(dataset,0.25,HEADERS[1:-1],HEADERS[-1])
 	print("train_x shape: ",train_x.shape)
 	print("train_y shape: ",train_y.shape)
 	print("test_x shape: ",test_x.shape)
